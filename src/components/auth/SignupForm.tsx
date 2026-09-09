@@ -225,13 +225,38 @@ export function SignupForm() {
             </div>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 space-y-4">
             <Button 
               type="submit" 
               className="w-full h-11 bg-white text-black hover:bg-white/90 font-medium"
               disabled={isLoading}
             >
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+            </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#111111] px-2 text-[#71717A]">Or register with</span>
+              </div>
+            </div>
+
+            <Button 
+              type="button" 
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              disabled={isLoading}
+              variant="outline" 
+              className="w-full h-11 border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all font-medium"
+            >
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.7 1 4 3.5 2.2 7.1l3.6 2.8C6.7 7.3 9.1 5 12 5z" />
+                <path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.3H12v4.3h5.9c-.3 1.4-1 2.5-2.2 3.3l3.6 2.8c2.1-1.9 3.3-4.7 3.3-8.1z" />
+                <path fill="#FBBC05" d="M5.8 14.1c-.2-.7-.3-1.4-.3-2.1s.1-1.4.3-2.1L2.2 7.1C1.4 8.6 1 10.2 1 12s.4 3.4 1.2 4.9l3.6-2.8z" />
+                <path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.8c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5L2.2 16.9C4 20.5 7.7 23 12 23z" />
+              </svg>
+              Sign up with Google
             </Button>
           </div>
         </form>

@@ -25,6 +25,7 @@ export default function DoubtDetailPage() {
   const [loading, setLoading] = useState(true);
   const [answerContent, setAnswerContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (doubtId) {
@@ -45,8 +46,13 @@ export default function DoubtDetailPage() {
   };
 
   const handlePostAnswer = async () => {
+    if (!session?.user) {
+      router.push(`/login?callbackUrl=/doubts/${doubtId}`);
+      return;
+    }
     if (!answerContent.trim()) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const res = await fetch(`/api/doubts/${doubtId}/answers`, {
         method: "POST",
@@ -56,9 +62,13 @@ export default function DoubtDetailPage() {
       if (res.ok) {
         setAnswerContent("");
         fetchDoubt(); // Refresh answers
+      } else {
+        const errText = await res.text();
+        setSubmitError(errText || "Failed to post answer. Please try again.");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      setSubmitError(e.message || "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -166,26 +176,60 @@ export default function DoubtDetailPage() {
       {!isOwner && !doubt.isResolved && (
         <Card className="bg-[#111111]/80 border-white/10 backdrop-blur-xl shadow-2xl">
           <CardContent className="p-6">
-            <h3 className="text-white font-medium mb-4">Know the answer? Help your peer!</h3>
-            <Textarea 
-              value={answerContent}
-              onChange={(e) => setAnswerContent(e.target.value)}
-              placeholder="Write your step-by-step explanation here..." 
-              className="bg-[#070707] border-white/10 text-white min-h-[120px] mb-4 focus-visible:ring-purple-500/50"
-            />
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-[#71717A]">Markdown is supported. Be respectful and clear.</p>
-              <Button 
-                onClick={handlePostAnswer}
-                disabled={isSubmitting || !answerContent.trim()}
-                className="bg-white text-black hover:bg-white/90"
-              >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-                Post Answer
-              </Button>
-            </div>
+            <h3 className="text-white font-medium mb-4 flex items-center justify-between">
+              <span>Know the answer? Help your peer!</span>
+              <span className="text-xs text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20 font-normal">
+                +5 Contribution Points
+              </span>
+            </h3>
+
+            {submitError && (
+              <div className="mb-4 p-3 text-sm font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
+                {submitError}
+              </div>
+            )}
+
+            {!session?.user ? (
+              <div className="p-6 text-center rounded-xl bg-white/5 border border-white/10 space-y-3">
+                <p className="text-sm text-[#A1A1AA]">
+                  Are you a senior or peer who can answer this doubt?
+                </p>
+                <Link href={`/login?callbackUrl=/doubts/${doubtId}`}>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-6">
+                    Sign in to Post Answer
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <>
+                <Textarea 
+                  value={answerContent}
+                  onChange={(e) => setAnswerContent(e.target.value)}
+                  placeholder="Write your detailed step-by-step explanation here..." 
+                  className="bg-[#070707] border-white/10 text-white min-h-[120px] mb-4 focus-visible:ring-purple-500/50"
+                />
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-[#71717A]">Markdown is supported. Be respectful and clear.</p>
+                  <Button 
+                    onClick={handlePostAnswer}
+                    disabled={isSubmitting || !answerContent.trim()}
+                    className="bg-white text-black hover:bg-white/90"
+                  >
+                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                    Post Answer
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
+      )}
+
+      {doubt.isResolved && (
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span>This doubt has been marked as resolved by the author. Browse the best answer below!</span>
+        </div>
       )}
 
       {/* Answers Section */}

@@ -97,46 +97,90 @@ export async function POST(req: Request) {
       parts: [{ text: enrichedQuestion }]
     });
 
-    // Call Gemini with a timeout
+    // Call Gemini with model fallback and a timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-    let response;
-    try {
-      response = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL || "gemini-3.6-flash",
-        contents,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-        },
-      });
-      clearTimeout(timeoutId);
-    } catch (genError: any) {
-      clearTimeout(timeoutId);
+    const modelsToTry = [
+      process.env.GEMINI_MODEL,
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash"
+    ].filter(Boolean) as string[];
 
-      if (genError.name === "AbortError") {
-        return NextResponse.json(
-          { error: "The AI took too long to respond. Please try again.", code: "TIMEOUT" },
-          { status: 504 }
-        );
+    let response: any = null;
+    let lastError: any = null;
+
+    for (const modelName of modelsToTry) {
+      try {
+        response = await ai.models.generateContent({
+          model: modelName,
+          contents,
+          config: {
+            systemInstruction: SYSTEM_INSTRUCTION,
+          },
+        });
+        if (response?.text) break;
+      } catch (err: any) {
+        lastError = err;
+        const errStr = String(err?.message || "");
+        // If it's an auth error, trying other models won't help
+        if (
+          err?.status === 401 ||
+          errStr.includes("UNAUTHENTICATED") ||
+          errStr.includes("authentication credentials") ||
+          errStr.includes("API key not valid") ||
+          errStr.includes("ACCESS_TOKEN_TYPE_UNSUPPORTED")
+        ) {
+          break;
+        }
+        // If it's a 404 model not found, loop to next candidate model
+        console.warn(`Gemini model ${modelName} failed, trying fallback...`, errStr.slice(0, 150));
+      }
+    }
+
+    clearTimeout(timeoutId);
+
+    if (!response?.text) {
+      if (lastError) {
+        const errStr = String(lastError?.message || "");
+        const status = lastError?.status || lastError?.code;
+
+        if (
+          status === 401 ||
+          errStr.includes("UNAUTHENTICATED") ||
+          errStr.includes("authentication") ||
+          errStr.includes("API key not valid") ||
+          errStr.includes("ACCESS_TOKEN_TYPE_UNSUPPORTED")
+        ) {
+          return NextResponse.json(
+            {
+              error: "Invalid Gemini API Key. Please get a free key from https://aistudio.google.com/app/apikey (starts with 'AIzaSy') and set GEMINI_API_KEY in your environment variables.",
+              code: "INVALID_API_KEY"
+            },
+            { status: 401 }
+          );
+        }
+
+        if (status === 429 || errStr.includes("quota") || errStr.includes("rate")) {
+          return NextResponse.json(
+            { error: "AI rate limit reached. Please wait a moment and try again.", code: "RATE_LIMIT" },
+            { status: 429 }
+          );
+        }
+
+        if (status === 400 || errStr.includes("safety")) {
+          return NextResponse.json(
+            { error: "Your question could not be processed due to safety guidelines. Please rephrase it.", code: "SAFETY_BLOCK" },
+            { status: 400 }
+          );
+        }
       }
 
-      // Parse Google API errors
-      const status = genError?.status || genError?.code;
-      if (status === 429 || genError?.message?.includes("quota") || genError?.message?.includes("rate")) {
-        return NextResponse.json(
-          { error: "AI is busy right now. Please wait a moment and try again.", code: "RATE_LIMIT" },
-          { status: 429 }
-        );
-      }
-      if (status === 400 || genError?.message?.includes("safety")) {
-        return NextResponse.json(
-          { error: "Your question couldn't be processed. Please rephrase it.", code: "SAFETY_BLOCK" },
-          { status: 400 }
-        );
-      }
-
-      throw genError; // bubble up to outer catch
+      return NextResponse.json(
+        { error: "AI could not generate a response. Please check your Gemini API key and try again.", code: "AI_GENERATION_FAILED" },
+        { status: 502 }
+      );
     }
 
     const text = response.text;

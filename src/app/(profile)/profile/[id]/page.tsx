@@ -64,7 +64,7 @@ export default async function PublicProfilePage({
     badgeColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
   }
 
-  const bestAnswersCount = user.answers.filter((a) => a.isBest).length;
+  const bestAnswersCount = user.answers.filter((a: any) => a.isBest).length;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -141,7 +141,7 @@ export default async function PublicProfilePage({
             </h3>
             <div className="flex flex-wrap gap-1.5">
               {user.subjects
-                ? user.subjects.split(",").map((s) => s.trim()).filter(Boolean).map((subj) => (
+                ? user.subjects.split(",").map((s: string) => s.trim()).filter(Boolean).map((subj: string) => (
                     <Badge key={subj} variant="outline" className="text-xs border-white/10 text-gray-300">
                       {subj}
                     </Badge>
@@ -154,7 +154,7 @@ export default async function PublicProfilePage({
             </h3>
             <div className="flex flex-wrap gap-1.5">
               {user.skills
-                ? user.skills.split(",").map((s) => s.trim()).filter(Boolean).map((sk) => (
+                ? user.skills.split(",").map((s: string) => s.trim()).filter(Boolean).map((sk: string) => (
                     <Badge key={sk} variant="secondary" className="text-xs bg-white/5 text-purple-300">
                       {sk}
                     </Badge>
@@ -175,7 +175,7 @@ export default async function PublicProfilePage({
               <p className="text-xs text-[#71717A]">No doubts asked yet.</p>
             ) : (
               <div className="space-y-3">
-                {user.doubts.map((doubt) => (
+                {user.doubts.map((doubt: any) => (
                   <Link key={doubt.id} href={`/doubts/${doubt.id}`} className="block group">
                     <div className="p-4 rounded-xl bg-[#111111]/60 border border-white/10 hover:border-purple-500/30 transition-all">
                       <div className="flex items-center justify-between mb-1">
@@ -209,7 +209,7 @@ export default async function PublicProfilePage({
               <p className="text-xs text-[#71717A]">No answers contributed yet.</p>
             ) : (
               <div className="space-y-3">
-                {user.answers.map((ans) => (
+                {user.answers.map((ans: any) => (
                   <Link key={ans.id} href={`/doubts/${ans.doubt.id}`} className="block group">
                     <div className="p-4 rounded-xl bg-[#111111]/60 border border-white/10 hover:border-emerald-500/30 transition-all">
                       <div className="flex items-center justify-between mb-1">

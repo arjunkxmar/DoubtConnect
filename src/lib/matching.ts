@@ -16,11 +16,11 @@ export async function findMatchesForDoubt(doubtId: string) {
     }
   });
 
-  const doubtTags = doubt.tags.toLowerCase().split(',').map(t => t.trim());
+  const doubtTags = doubt.tags.toLowerCase().split(',').map((t: string) => t.trim());
   const doubtTopic = doubt.topic.toLowerCase();
   const doubtSubject = doubt.subject.toLowerCase();
   
-  const matches = users.map(user => {
+  const matches = users.map((user: any) => {
     let score = 0;
     const userSubjects = user.subjects.toLowerCase();
     const userSkills = user.skills.toLowerCase();
@@ -32,7 +32,7 @@ export async function findMatchesForDoubt(doubtId: string) {
 
     // 2. Topic/Tag Match (High: +20)
     let tagMatch = false;
-    doubtTags.forEach(tag => {
+    doubtTags.forEach((tag: string) => {
       if (userSkills.includes(tag) || userSubjects.includes(tag) || tag.includes(doubtTopic)) {
         tagMatch = true;
       }
@@ -65,8 +65,8 @@ export async function findMatchesForDoubt(doubtId: string) {
   // Filter users who passed the threshold and sort by score
   const threshold = 40;
   const topMatches = matches
-    .filter(m => m.score >= threshold)
-    .sort((a, b) => b.score - a.score)
+    .filter((m: any) => m.score >= threshold)
+    .sort((a: any, b: any) => b.score - a.score)
     .slice(0, 3); // Take top 3
 
   // Create notifications for matched users

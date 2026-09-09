@@ -36,7 +36,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     ]);
 
     // Find the author of the best answer to reward them
-    const bestAnswer = doubt.answers.find(a => a.id === resolvedParams.answerId);
+    const bestAnswer = doubt.answers.find((a: any) => a.id === resolvedParams.answerId);
     if (bestAnswer && bestAnswer.authorId !== userId) {
       await prisma.user.update({
         where: { id: bestAnswer.authorId },

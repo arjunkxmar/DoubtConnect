@@ -155,7 +155,7 @@ export default async function SubjectDetailPage({
             </div>
           ) : (
             <div className="space-y-4">
-              {doubts.map((doubt) => (
+              {doubts.map((doubt: any) => (
                 <Link key={doubt.id} href={`/doubts/${doubt.id}`} className="block group">
                   <div className="p-5 rounded-2xl bg-[#111111]/70 border border-white/10 hover:border-purple-500/40 hover:bg-[#141414] transition-all backdrop-blur-xl shadow-lg">
                     <div className="flex items-start justify-between gap-4 mb-2">
@@ -222,7 +222,7 @@ export default async function SubjectDetailPage({
               <p className="text-xs text-[#71717A]">No mentors listed for this subject yet.</p>
             ) : (
               <div className="space-y-3">
-                {mentors.map((m) => (
+                {mentors.map((m: any) => (
                   <Link key={m.id} href={`/profile/${m.id}`} className="block group">
                     <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
                       <div className="flex items-center gap-3">

@@ -81,7 +81,7 @@ export default async function ProfilePage() {
               <div>
                 <p className="text-xs text-[#71717A] uppercase font-semibold mb-2">Subjects</p>
                 <div className="flex flex-wrap gap-2">
-                  {user.subjects.split(',').map(s => s.trim()).filter(Boolean).map(subject => (
+                  {user.subjects.split(',').map((s: string) => s.trim()).filter(Boolean).map((subject: string) => (
                     <Badge key={subject} variant="outline" className="border-white/10 text-[#A1A1AA]">{subject}</Badge>
                   ))}
                   {!user.subjects && <span className="text-sm text-[#71717A]">No subjects added</span>}
@@ -90,7 +90,7 @@ export default async function ProfilePage() {
               <div>
                 <p className="text-xs text-[#71717A] uppercase font-semibold mb-2">Skills</p>
                 <div className="flex flex-wrap gap-2">
-                  {user.skills.split(',').map(s => s.trim()).filter(Boolean).map(skill => (
+                  {user.skills.split(',').map((s: string) => s.trim()).filter(Boolean).map((skill: string) => (
                     <Badge key={skill} variant="secondary" className="bg-white/5 text-white hover:bg-white/10">{skill}</Badge>
                   ))}
                   {!user.skills && <span className="text-sm text-[#71717A]">No skills added</span>}

@@ -105,7 +105,7 @@ export class LexicalSimilarityStrategy implements SimilarityStrategy {
     }
 
     // Score and rank each candidate
-    const scored: ScoredDoubt[] = candidates.map((doubt) => {
+    const scored: ScoredDoubt[] = candidates.map((doubt: any) => {
       let score = 0;
       const doubtTitleLower = doubt.title.toLowerCase();
       const doubtTopicLower = doubt.topic.toLowerCase();

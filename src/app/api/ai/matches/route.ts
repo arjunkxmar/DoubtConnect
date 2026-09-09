@@ -78,12 +78,12 @@ export async function POST(req: Request) {
       : String(tags).toLowerCase().split(",").map((t: string) => t.trim());
 
     const scored = users
-      .map(user => ({ user, score: scoreUser(user, { subject, topic, tags: tagList, authorYear }) }))
-      .filter(({ score }) => score >= 20) // lower threshold for AI context (no full doubt)
-      .sort((a, b) => b.score - a.score)
+      .map((user: any) => ({ user, score: scoreUser(user, { subject, topic, tags: tagList, authorYear }) }))
+      .filter(({ score }: { score: number }) => score >= 20) // lower threshold for AI context (no full doubt)
+      .sort((a: any, b: any) => b.score - a.score)
       .slice(0, 4);
 
-    const matches = scored.map(({ user, score }) => ({
+    const matches = scored.map(({ user, score }: { user: any; score: number }) => ({
       id: user.id,
       name: user.fullName,
       academicYear: user.academicYear,

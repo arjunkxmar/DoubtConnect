@@ -41,8 +41,8 @@ export async function GET() {
     });
 
     // Format for frontend
-    const formatted = conversations.map(c => {
-      const otherUser = c.participants.find(p => p.id !== userId) || c.participants[0];
+    const formatted = conversations.map((c: any) => {
+      const otherUser = c.participants.find((p: any) => p.id !== userId) || c.participants[0];
       return {
         id: c.id,
         user: {

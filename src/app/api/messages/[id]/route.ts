@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     });
 
     if (!conversation) return new NextResponse("Not Found", { status: 404 });
-    if (!conversation.participants.some(p => p.id === userId)) {
+    if (!conversation.participants.some((p: any) => p.id === userId)) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 
@@ -40,7 +40,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       orderBy: { createdAt: "asc" }
     });
 
-    const otherUser = conversation.participants.find(p => p.id !== userId) || conversation.participants[0];
+    const otherUser = conversation.participants.find((p: any) => p.id !== userId) || conversation.participants[0];
 
     return NextResponse.json({
       conversation: {
@@ -53,7 +53,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
           avatar: otherUser.fullName.charAt(0)
         }
       },
-      messages: messages.map(m => ({
+      messages: messages.map((m: any) => ({
         id: m.id,
         content: m.content,
         sender: m.senderId === userId ? 'me' : 'them',
@@ -85,7 +85,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     if (!conversation) return new NextResponse("Not Found", { status: 404 });
-    if (!conversation.participants.some(p => p.id === userId)) {
+    if (!conversation.participants.some((p: any) => p.id === userId)) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 
@@ -105,7 +105,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     ]);
 
     // Send notification to the other user
-    const otherUser = conversation.participants.find(p => p.id !== userId);
+    const otherUser = conversation.participants.find((p: any) => p.id !== userId);
     if (otherUser) {
       await prisma.notification.create({
         data: {

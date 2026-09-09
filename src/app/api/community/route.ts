@@ -57,10 +57,10 @@ export async function GET(req: Request) {
     });
 
     const sorted = tab === "trending"
-      ? [...posts].sort((a, b) => b._count.likes - a._count.likes)
+      ? [...posts].sort((a: any, b: any) => b._count.likes - a._count.likes)
       : posts;
 
-    const formatted = sorted.map(p => ({
+    const formatted = sorted.map((p: any) => ({
       id: p.id,
       type: p.type,
       title: p.title,

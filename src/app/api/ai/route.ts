@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     if (!apiKey || apiKey === "your_gemini_api_key_here") {
       return NextResponse.json(
         {
-          error: "AI Assistant is not configured yet. Please add your GEMINI_API_KEY to the .env file.",
+          error: "AI Assistant is not configured yet. Please add your GEMINI_API_KEY to your environment variables.",
           code: "MISSING_API_KEY"
         },
         { status: 503 }
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
     let response;
     try {
       response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: process.env.GEMINI_MODEL || "gemini-3.6-flash",
         contents,
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
